@@ -1,0 +1,6 @@
+.pio
+.pioenvs
+.piolibdeps
+data/homie/config.json
+src/main.cpp
+.settings
