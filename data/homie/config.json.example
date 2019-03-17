@@ -1,0 +1,16 @@
+{
+        "name":"BZ LED Colortemperature 1",
+        "device_id":"bzesp3a46d",
+        "wifi":{"ssid":"MySSID", "password":"T0pS3cr3t!"},
+        "mqtt":{"host":"cubietruck","port":1883,"base_topic":"homie/","auth":false},
+        "ota":{"enabled":true},
+        "settings":{
+                "loglevel": "DEBUG",
+                "CTLicht1_PIN_WW": 15,
+                "CTLicht1_PIN_CW": 13,
+                "CTLicht2_PIN_WW": 12,
+                "CTLicht2_PIN_CW": 14
+        } 
+}
+
+

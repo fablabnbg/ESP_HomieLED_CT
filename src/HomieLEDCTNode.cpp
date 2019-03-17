@@ -18,8 +18,8 @@ const uint16_t /*PROGMEM*/ HomieLEDCTNode::gamma8[] = {
   913,940,968,996,1024 };
 
 
-HomieLEDCTNode::HomieLEDCTNode(const String& id, HomieSetting<long>& _pinCW, HomieSetting<long>& _pinWW):
-		HomieNode(id.c_str(), "LED mit Farbtemperatur", "led_ct"),
+HomieLEDCTNode::HomieLEDCTNode(const char* id, HomieSetting<long>& _pinWW, HomieSetting<long>& _pinCW):
+		HomieNode(id, "LED mit Farbtemperatur", "led_ct"),
 		pinCW(-1),
 		pinWW(-1),
 		curBrightness(0),
@@ -34,10 +34,10 @@ HomieLEDCTNode::HomieLEDCTNode(const String& id, HomieSetting<long>& _pinCW, Hom
 	advertise("ctemp").setName("Farbtemperatur").setDatatype("integer").setUnit("%").settable();
 	advertise("coldwhite").setName("").setDatatype("integer").setFormat("0:1024");
 	advertise("warmwhite").setName("").setDatatype("integer").setFormat("0:1024");
-	pinMode(pinCW, OUTPUT);
-	pinMode(pinWW, OUTPUT);
 	analogWriteFreq(8000);
 	settingPinCW.setDefaultValue(-1).setValidator([] (long candidate) {
+		return (candidate >= 0 || candidate <= 16);});
+	settingPinWW.setDefaultValue(-1).setValidator([] (long candidate) {
 		return (candidate >= 0 || candidate <= 16);});
 }
 
@@ -50,6 +50,7 @@ bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property
 			curBrightness = 0;
 		}
 		setProperty("bright").setRetained(true).send(String(curBrightness));
+		setPins();
 		return true;
 	} else if (property.equalsIgnoreCase("ctemp")) {
 		curColorTemp = value.toInt();
@@ -58,22 +59,32 @@ bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property
 			curColorTemp = 50;
 		}
 		setProperty("ctemp").setRetained(true).send(String(curColorTemp));
+		setPins();
 		return true;
 	}
 	return false;
 }
 
 void HomieLEDCTNode::setup() {
-//	pinCW = settingPinCW.get();
-//	pinWW = settingPinWW.get();
-	pinCW = 13;
-	pinWW = 15;
+	pinCW = settingPinCW.get();
+	pinWW = settingPinWW.get();
+	LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Set output pins to %d (CW) and %d (WW).", pinCW, pinWW);
+	pinMode(pinCW, OUTPUT);
+	pinMode(pinWW, OUTPUT);
+	setPins();
+}
+
+void HomieLEDCTNode::onReadyToOperate() {
+	setPins();
+	setProperty("bright").setRetained(true).send(String(curBrightness));
+	setProperty("ctemp").setRetained(true).send(String(curColorTemp));
 }
 
 void HomieLEDCTNode::setPins() {
 	uint32_t bright=gamma8[curBrightness];
 	uint16_t warm = bright * curColorTemp / 100;
 	uint16_t cold = bright - warm;
+	LN.logf(__PRETTY_FUNCTION__, LoggerNode::DEBUG, "Set brightness to gamma-corerected value %d, distributed to %d CW and %d WW (Factor %d).", bright, cold, warm, curColorTemp);
 	analogWrite(pinCW, cold);
 	analogWrite(pinWW, warm);
 	setProperty("coldwhite").setRetained(true).send("cold");
