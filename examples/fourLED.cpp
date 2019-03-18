@@ -8,12 +8,23 @@
 
 HomieSetting<long> settingCT1_WW ("CTLicht1_PIN_WW", "Output Pin Licht 1 warmweiß");
 HomieSetting<long> settingCT1_CW ("CTLicht1_PIN_CW", "Output Pin Licht 1 kaltweiß");
+HomieSetting<long> settingCT2_WW ("CTLicht2_PIN_WW", "Output Pin Licht 2 warmweiß");
+HomieSetting<long> settingCT2_CW ("CTLicht2_PIN_CW", "Output Pin Licht 2 kaltweiß");
+HomieSetting<long> settingCT3_WW ("CTLicht3_PIN_WW", "Output Pin Licht 3 warmweiß");
+HomieSetting<long> settingCT3_CW ("CTLicht3_PIN_CW", "Output Pin Licht 3 kaltweiß");
+HomieSetting<long> settingCT4_WW ("CTLicht4_PIN_WW", "Output Pin Licht 4 warmweiß");
+HomieSetting<long> settingCT4_CW ("CTLicht4_PIN_CW", "Output Pin Licht 4 kaltweiß");
+
+
 HomieSetting<long> settingCT_PWMFREQ ("CTLicht_PWM_FREQ", "PWM Frequency");
 
 LoggerNode LN;
 HomieLEDCTNode CTLight1("CTLicht1", settingCT1_WW, settingCT1_CW);
+HomieLEDCTNode CTLight2("CTLicht2", settingCT2_WW, settingCT2_CW);
+HomieLEDCTNode CTLight3("CTLicht2", settingCT3_WW, settingCT3_CW);
+HomieLEDCTNode CTLight4("CTLicht2", settingCT4_WW, settingCT4_CW);
 
-#define FW_NAME "fln-ledct_1x"
+#define FW_NAME "fln-ledct_4x"
 #define FW_VERSION "0.0.2"
 
 /* Magic sequence for Autodetectable Binary Upload */
