@@ -10,6 +10,10 @@
                 "CTLicht1_PIN_CW": 13,
                 "CTLicht2_PIN_WW": 12,
                 "CTLicht2_PIN_CW": 14,
+		"CTLicht3_PIN_WW": 5,
+                "CTLicht3_PIN_CW": 4,
+                "CTLicht4_PIN_WW": 0,
+                "CTLicht4_PIN_CW": 2,                
                 "CTLicht_PWM_FREQ": 8000
         } 
 }
