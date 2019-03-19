@@ -60,7 +60,9 @@ env:
     
 install:
     - pip install -U platformio
-    - platformio update
+    - platformio lib install https://github.com/homieiot/homie-esp8266.git#develop-v3
+    - platformio lib install https://github.com/euphi/HomieLoggerNode#develop-v3
+    #- platformio update
 
 script:
     - platformio ci --lib="." --board=d1_mini
