@@ -15,7 +15,7 @@ const uint16_t /*PROGMEM*/ HomieLEDCTNode::gamma8[] = {
   131,139,147,155,164,173,182,192,202,212,223,234,245,257,269,281,
   293,307,320,334,348,362,377,392,408,424,441,458,475,493,511,529,
   548,568,587,608,628,650,671,693,716,739,762,786,811,836,861,887,
-  913,940,968,996,1024 };
+  913,940,968,996,1023 };
 
 
 HomieLEDCTNode::HomieLEDCTNode(const char* id, HomieSetting<long>& _pinWW, HomieSetting<long>& _pinCW):
@@ -64,7 +64,7 @@ bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property
 void HomieLEDCTNode::setup() {
 	pinCW = settingPinCW.get();
 	pinWW = settingPinWW.get();
-	LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Set output pins to %d (CW) and %d (WW).", pinCW, pinWW);
+	//LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Set output pins to %d (CW) and %d (WW).", pinCW, pinWW);
 	pinMode(pinCW, OUTPUT);
 	pinMode(pinWW, OUTPUT);
 	setPins();
@@ -80,7 +80,7 @@ void HomieLEDCTNode::setPins() {
 	uint32_t bright=gamma8[curBrightness];
 	uint16_t warm = bright * curColorTemp / 100;
 	uint16_t cold = bright - warm;
-	LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Set brightness to gamma-corrected value %d, distributed to %d CW and %d WW (Factor %d).", bright, cold, warm, curColorTemp);
+	//LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Set brightness to gamma-corrected value %d, distributed to %d CW and %d WW (Factor %d).", bright, cold, warm, curColorTemp);
 	analogWrite(pinCW, cold);
 	analogWrite(pinWW, warm);
 	setProperty("coldwhite").setRetained(true).send(String(cold));

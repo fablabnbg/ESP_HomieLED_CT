@@ -21,11 +21,11 @@ HomieSetting<long> settingCT_PWMFREQ ("CTLicht_PWM_FREQ", "PWM Frequency");
 LoggerNode LN;
 HomieLEDCTNode CTLight1("CTLicht1", settingCT1_WW, settingCT1_CW);
 HomieLEDCTNode CTLight2("CTLicht2", settingCT2_WW, settingCT2_CW);
-HomieLEDCTNode CTLight3("CTLicht2", settingCT3_WW, settingCT3_CW);
-HomieLEDCTNode CTLight4("CTLicht2", settingCT4_WW, settingCT4_CW);
+HomieLEDCTNode CTLight3("CTLicht3", settingCT3_WW, settingCT3_CW);
+HomieLEDCTNode CTLight4("CTLicht4", settingCT4_WW, settingCT4_CW);
 
 #define FW_NAME "fln-ledct_4x"
-#define FW_VERSION "0.0.2"
+#define FW_VERSION "0.0.3"
 
 /* Magic sequence for Autodetectable Binary Upload */
 const char *__FLAGGED_FW_NAME = "\xbf\x84\xe4\x13\x54" FW_NAME "\x93\x44\x6b\xa7\x75";
@@ -39,8 +39,10 @@ void setup() {
 	Homie_setFirmware(FW_NAME, FW_VERSION);
 	Homie.disableResetTrigger();
 	//Homie.disableLedFeedback();
-	analogWriteFreq(settingCT_PWMFREQ.get());
 	Homie.setup();
+	LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Setting PWM frequency to %d.", settingCT_PWMFREQ.get());
+	analogWriteFreq(settingCT_PWMFREQ.get());
+
 
 }
 
