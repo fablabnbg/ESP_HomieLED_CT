@@ -1,4 +1,4 @@
-# ESP_HomieLED_CT
+# ESP_HomieLED_CT [![Build Status](https://travis-ci.org/fablabnbg/ESP_HomieLED_CT.svg?branch=master)](https://travis-ci.org/fablabnbg/ESP_HomieLED_CT)
 
 Homie Node for ESP8266 to control a colortemperature LED
 
