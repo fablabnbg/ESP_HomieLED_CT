@@ -25,7 +25,7 @@ HomieLEDCTNode CTLight3("CTLicht3", settingCT3_WW, settingCT3_CW);
 HomieLEDCTNode CTLight4("CTLicht4", settingCT4_WW, settingCT4_CW);
 
 #define FW_NAME "fln-ledct_4x"
-#define FW_VERSION "0.0.3"
+#define FW_VERSION "0.0.7"
 
 /* Magic sequence for Autodetectable Binary Upload */
 const char *__FLAGGED_FW_NAME = "\xbf\x84\xe4\x13\x54" FW_NAME "\x93\x44\x6b\xa7\x75";

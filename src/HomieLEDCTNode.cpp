@@ -8,7 +8,8 @@
 #include <HomieLEDCTNode.h>
 #include <LoggerNode.h>
 
-const uint16_t /*PROGMEM*/ HomieLEDCTNode::gamma8[] = {
+/* gamma 2.8 
+const uint16_t PROGMEM HomieLEDCTNode::gamma8[] = {
   0,0,0,0,0,0,0,1,1,1,2,2,3,3,4,5,
   6,7,8,10,11,13,15,17,19,21,24,26,29,32,35,39,
   42,46,50,54,59,63,68,73,79,84,90,96,103,109,116,124,
@@ -16,6 +17,17 @@ const uint16_t /*PROGMEM*/ HomieLEDCTNode::gamma8[] = {
   293,307,320,334,348,362,377,392,408,424,441,458,475,493,511,529,
   548,568,587,608,628,650,671,693,716,739,762,786,811,836,861,887,
   913,940,968,996,1023 };
+*/
+
+
+const uint16_t /*PROGMEM*/ HomieLEDCTNode::gamma8[] = {
+  0,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,
+  19,21,24,27,30,33,37,40,44,49,53,57,62,67,72,78,
+  83,89,95,102,108,115,122,129,136,144,152,160,168,177,186,194,
+  204,213,223,233,243,253,264,275,286,297,309,321,333,345,358,371,
+  384,397,410,424,438,453,467,482,497,512,528,544,560,576,593,610,
+  627,644,662,680,698,716,735,754,773,792,812,832,852,873,894,915,
+  936,958,979,1002,1024 };
 
 
 HomieLEDCTNode::HomieLEDCTNode(const char* id, HomieSetting<long>& _pinWW, HomieSetting<long>& _pinCW):
@@ -29,6 +41,7 @@ HomieLEDCTNode::HomieLEDCTNode(const char* id, HomieSetting<long>& _pinWW, Homie
 {
 	advertise("bright").setName("Helligkeit").setDatatype("integer").setUnit("%").settable();
 	advertise("ctemp").setName("Farbtemperatur").setDatatype("integer").setUnit("%").settable();
+	advertise("state").setName("Zustand").setDatatype("boolean").settable();
 	advertise("coldwhite").setName("").setDatatype("integer").setFormat("0:1024");
 	advertise("warmwhite").setName("").setDatatype("integer").setFormat("0:1024");
 	settingPinCW.setDefaultValue(-1).setValidator([] (long candidate) {
@@ -55,6 +68,16 @@ bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property
 			curColorTemp = 50;
 		}
 		setProperty("ctemp").setRetained(true).send(String(curColorTemp));
+		setPins();
+		return true;
+	} else if (property.equalsIgnoreCase("state")) {
+		bool on = value.equalsIgnoreCase("ON");
+		if (on && curBrightness == 0) {
+			curBrightness = 80;
+		} else if (!on && curBrightness > 0) {
+			curBrightness = 0;
+		}
+		setProperty("bright").setRetained(true).send(String(curBrightness));
 		setPins();
 		return true;
 	}
@@ -85,4 +108,5 @@ void HomieLEDCTNode::setPins() {
 	analogWrite(pinWW, warm);
 	setProperty("coldwhite").setRetained(true).send(String(cold));
 	setProperty("warmwhite").setRetained(true).send(String(warm));
+	setProperty("state").setRetained(true).send(String(curBrightness>0?"ON":"OFF"));
 }
