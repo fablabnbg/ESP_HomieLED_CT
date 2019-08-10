@@ -20,6 +20,7 @@ const uint16_t PROGMEM HomieLEDCTNode::gamma8[] = {
 */
 
 
+/* Gamma-table with gamma value of 2.2 and linear scaled increments for low percentage values. (18% -> 21/1024 is first point of real gamma curve) */
 const uint16_t /*PROGMEM*/ HomieLEDCTNode::gamma8[] = {
   0,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,
   19,21,24,27,30,33,37,40,44,49,53,57,62,67,72,78,
@@ -52,33 +53,36 @@ HomieLEDCTNode::HomieLEDCTNode(const char* id, HomieSetting<long>& _pinWW, Homie
 
 bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property, const String& value) {
 	LN.logf(__PRETTY_FUNCTION__, LoggerNode::DEBUG, "Received input for property %s, value %s", property.c_str(), value.c_str());
+	uint8_t newB = curBrightness;
+	uint8_t newT = curColorTemp;
 	if (property.equalsIgnoreCase("bright")) {
-		curBrightness = value.toInt();
+		newB = value.toInt();
 		if (curBrightness < 0 ||  curBrightness > 100) {
 			LN.logf(__PRETTY_FUNCTION__, LoggerNode::WARNING, "Received invalid brightness value %d.", curBrightness);
-			curBrightness = 0;
+			newB = curBrightness;
 		}
+		setPins(newB, newT);
 		setProperty("bright").setRetained(true).send(String(curBrightness));
-		setPins();
 		return true;
 	} else if (property.equalsIgnoreCase("ctemp")) {
 		curColorTemp = value.toInt();
 		if (curColorTemp < 0 ||  curColorTemp > 100) {
 			LN.logf(__PRETTY_FUNCTION__, LoggerNode::WARNING, "Received invalid color temp value %d.", curColorTemp);
-			curColorTemp = 50;
+			newT = curColorTemp;
 		}
+		setPins(newB, newT);
 		setProperty("ctemp").setRetained(true).send(String(curColorTemp));
-		setPins();
 		return true;
 	} else if (property.equalsIgnoreCase("state")) {
 		bool on = value.equalsIgnoreCase("ON");
 		if (on && curBrightness == 0) {
-			curBrightness = 80;
+			newB = 80;
+			curBrightness = 0; //hack to make setPins sending out the new "state" state
 		} else if (!on && curBrightness > 0) {
-			curBrightness = 0;
+			newB = 0;
+			curBrightness = 100;  //hack to make setPins sending out the new "state" state
 		}
-		setProperty("bright").setRetained(true).send(String(curBrightness));
-		setPins();
+		setPins(newB, newT);
 		return true;
 	}
 	return false;
@@ -87,19 +91,24 @@ bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property
 void HomieLEDCTNode::setup() {
 	pinCW = settingPinCW.get();
 	pinWW = settingPinWW.get();
-	//LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Set output pins to %d (CW) and %d (WW).", pinCW, pinWW);
 	pinMode(pinCW, OUTPUT);
 	pinMode(pinWW, OUTPUT);
-	setPins();
+	setPins(curBrightness, curColorTemp);
 }
 
 void HomieLEDCTNode::onReadyToOperate() {
-	setPins();
 	setProperty("bright").setRetained(true).send(String(curBrightness));
 	setProperty("ctemp").setRetained(true).send(String(curColorTemp));
+	setPins(curBrightness, curColorTemp);
 }
 
-void HomieLEDCTNode::setPins() {
+void HomieLEDCTNode::setPins(uint8_t newBrightness, uint8_t newColorTemp) {
+	if (newBrightness != curBrightness) {
+		if (curBrightness == 0) setProperty("state").setRetained(true).send(String("ON"));
+		if (newBrightness == 0) setProperty("state").setRetained(true).send(String("OFF"));
+		curBrightness = newBrightness;
+		setProperty("bright").setRetained(true).send(String(curBrightness));
+	}
 	uint32_t bright=gamma8[curBrightness];
 	uint16_t warm = bright * curColorTemp / 100;
 	uint16_t cold = bright - warm;
@@ -108,5 +117,4 @@ void HomieLEDCTNode::setPins() {
 	analogWrite(pinWW, warm);
 	setProperty("coldwhite").setRetained(true).send(String(cold));
 	setProperty("warmwhite").setRetained(true).send(String(warm));
-	setProperty("state").setRetained(true).send(String(curBrightness>0?"ON":"OFF"));
 }

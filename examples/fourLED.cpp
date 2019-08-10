@@ -25,7 +25,7 @@ HomieLEDCTNode CTLight3("CTLicht3", settingCT3_WW, settingCT3_CW);
 HomieLEDCTNode CTLight4("CTLicht4", settingCT4_WW, settingCT4_CW);
 
 #define FW_NAME "fln-ledct_4x"
-#define FW_VERSION "0.0.7"
+#define FW_VERSION "0.0.8"
 
 /* Magic sequence for Autodetectable Binary Upload */
 const char *__FLAGGED_FW_NAME = "\xbf\x84\xe4\x13\x54" FW_NAME "\x93\x44\x6b\xa7\x75";
@@ -38,12 +38,10 @@ void setup() {
 	Serial.flush();
 	Homie_setFirmware(FW_NAME, FW_VERSION);
 	Homie.disableResetTrigger();
-	//Homie.disableLedFeedback();
+	//Homie.disableLedFeedback();	--> on D1 Mini, BUILTIN_LED is used to show connection state (SLOW Blinking: No Wifi Connection, Fast Blinking: Wifi connected, but no MQTT)
 	Homie.setup();
 	LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Setting PWM frequency to %d.", settingCT_PWMFREQ.get());
 	analogWriteFreq(settingCT_PWMFREQ.get());
-
-
 }
 
 void loop() {

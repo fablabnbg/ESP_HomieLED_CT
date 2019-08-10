@@ -29,7 +29,8 @@ private:
 	HomieSetting<long>&  settingPinWW;
 	HomieSetting<long>&  settingPinCW;
 
-	void setPins();
+	void setPins(uint8_t newBrightness, uint8_t newColorTemp);
+
 
 
 };
