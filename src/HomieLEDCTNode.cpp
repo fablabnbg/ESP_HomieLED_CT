@@ -31,24 +31,25 @@ const uint16_t /*PROGMEM*/ HomieLEDCTNode::gamma8[] = {
   936,958,979,1002,1024 };
 
 
-HomieLEDCTNode::HomieLEDCTNode(const char* id, HomieSetting<long>& _pinWW, HomieSetting<long>& _pinCW):
+HomieLEDCTNode::HomieLEDCTNode(const char* id, long _pinWW, long _pinCW):
 		HomieNode(id, "LED mit Farbtemperatur", "led_ct"),
 		pinCW(-1),
 		pinWW(-1),
 		curBrightness(0),
-		curColorTemp(0),
-		settingPinWW(_pinWW),
-		settingPinCW(_pinCW)
+		curColorTemp(0)
 {
 	advertise("bright").setName("Helligkeit").setDatatype("integer").setUnit("%").settable();
 	advertise("ctemp").setName("Farbtemperatur").setDatatype("integer").setUnit("%").settable();
 	advertise("state").setName("Zustand").setDatatype("boolean").settable();
 	advertise("coldwhite").setName("").setDatatype("integer").setFormat("0:1024");
 	advertise("warmwhite").setName("").setDatatype("integer").setFormat("0:1024");
-	settingPinCW.setDefaultValue(-1).setValidator([] (long candidate) {
-		return (candidate >= 0 || candidate <= 16);});
-	settingPinWW.setDefaultValue(-1).setValidator([] (long candidate) {
-		return (candidate >= 0 || candidate <= 16);});
+
+	if (!(_pinWW >= 0 && _pinWW <= 16) || !(_pinCW >= 0 && _pinCW <= 16)) {
+		HomieInternals::Helpers::abort(F("✖ HomieLEDCTNode(): pin out of range"));
+	};
+
+	pinCW = _pinCW;
+	pinWW = _pinWW;
 }
 
 bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property, const String& value) {
@@ -75,10 +76,10 @@ bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property
 		return true;
 	} else if (property.equalsIgnoreCase("state")) {
 		bool on = value.equalsIgnoreCase("ON");
-		if (on && curBrightness == 0) {
+		if (on) {
 			newB = 80;
 			curBrightness = 0; //hack to make setPins sending out the new "state" state
-		} else if (!on && curBrightness > 0) {
+		} else if (!on) {
 			newB = 0;
 			curBrightness = 100;  //hack to make setPins sending out the new "state" state
 		}
@@ -89,11 +90,10 @@ bool HomieLEDCTNode::handleInput(const HomieRange& range, const String& property
 }
 
 void HomieLEDCTNode::setup() {
-	pinCW = settingPinCW.get();
-	pinWW = settingPinWW.get();
+	curBrightness = 0;
+	curColorTemp = 25;
 	pinMode(pinCW, OUTPUT);
 	pinMode(pinWW, OUTPUT);
-	setPins(curBrightness, curColorTemp);
 }
 
 void HomieLEDCTNode::onReadyToOperate() {

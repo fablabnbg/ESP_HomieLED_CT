@@ -6,23 +6,22 @@
 
 #include <HomieLEDCTNode.h>
 
-HomieSetting<long> settingCT1_WW ("CTLicht1_PIN_WW", "Output Pin Licht 1 warmweiß");
-HomieSetting<long> settingCT1_CW ("CTLicht1_PIN_CW", "Output Pin Licht 1 kaltweiß");
-HomieSetting<long> settingCT2_WW ("CTLicht2_PIN_WW", "Output Pin Licht 2 warmweiß");
-HomieSetting<long> settingCT2_CW ("CTLicht2_PIN_CW", "Output Pin Licht 2 kaltweiß");
-HomieSetting<long> settingCT3_WW ("CTLicht3_PIN_WW", "Output Pin Licht 3 warmweiß");
-HomieSetting<long> settingCT3_CW ("CTLicht3_PIN_CW", "Output Pin Licht 3 kaltweiß");
-HomieSetting<long> settingCT4_WW ("CTLicht4_PIN_WW", "Output Pin Licht 4 warmweiß");
-HomieSetting<long> settingCT4_CW ("CTLicht4_PIN_CW", "Output Pin Licht 4 kaltweiß");
-
+#define CT_LIGHT1_PIN_WW 15
+#define CT_LIGHT1_PIN_CW 13
+#define CT_LIGHT2_PIN_WW 14
+#define CT_LIGHT2_PIN_CW 12
+#define CT_LIGHT3_PIN_WW 5
+#define CT_LIGHT3_PIN_CW 4
+#define CT_LIGHT4_PIN_WW 0
+#define CT_LIGHT4_PIN_CW 16
 
 HomieSetting<long> settingCT_PWMFREQ ("CTLicht_PWM_FREQ", "PWM Frequency");
 
 LoggerNode LN;
-HomieLEDCTNode CTLight1("CTLicht1", settingCT1_WW, settingCT1_CW);
-HomieLEDCTNode CTLight2("CTLicht2", settingCT2_WW, settingCT2_CW);
-HomieLEDCTNode CTLight3("CTLicht3", settingCT3_WW, settingCT3_CW);
-HomieLEDCTNode CTLight4("CTLicht4", settingCT4_WW, settingCT4_CW);
+HomieLEDCTNode CTLight1("CTLicht1", CT_LIGHT1_PIN_WW, CT_LIGHT1_PIN_CW);
+HomieLEDCTNode CTLight2("CTLicht2", CT_LIGHT2_PIN_WW, CT_LIGHT2_PIN_CW);
+HomieLEDCTNode CTLight3("CTLicht3", CT_LIGHT3_PIN_WW, CT_LIGHT3_PIN_CW);
+HomieLEDCTNode CTLight4("CTLicht4", CT_LIGHT4_PIN_WW, CT_LIGHT4_PIN_CW);
 
 #define FW_NAME "fln-ledct_4x"
 #define FW_VERSION "0.0.8"
@@ -42,6 +41,7 @@ void setup() {
 	Homie.setup();
 	LN.logf(__PRETTY_FUNCTION__, LoggerNode::INFO, "Setting PWM frequency to %d.", settingCT_PWMFREQ.get());
 	analogWriteFreq(settingCT_PWMFREQ.get());
+	analogWriteRange(1024);
 }
 
 void loop() {

@@ -13,7 +13,7 @@
 class HomieLEDCTNode: public HomieNode {
 
 public:
-	HomieLEDCTNode(const char* id, HomieSetting<long>& pinWW, HomieSetting<long>& pinCW);
+	HomieLEDCTNode(const char* id, long pinWW, long pinCW);
 
 protected:
 	virtual void setup() override;
@@ -26,8 +26,6 @@ private:
 	uint8_t pinCW, pinWW;
 	uint8_t curBrightness;
 	uint8_t curColorTemp;
-	HomieSetting<long>&  settingPinWW;
-	HomieSetting<long>&  settingPinCW;
 
 	void setPins(uint8_t newBrightness, uint8_t newColorTemp);
 
